@@ -36,7 +36,7 @@
 
 <div id="appRootContainer" class="flex flex-col min-h-screen w-full">
 
-  <!-- 微信小程序胶囊顶栏（开启小程序预览模式时显示） -->
+  <!-- 微信小程序胶囊顶栏 -->
   <div id="mpTopNavigationBar" class="hidden bg-white border-b border-slate-100 px-4 py-2.5 sticky top-0 z-40 items-center justify-between">
     <div class="flex items-center space-x-2">
       <span class="text-xs bg-wxGreen/10 text-wxGreen font-bold px-2 py-0.5 rounded">小程序端</span>
@@ -61,38 +61,32 @@
       </div>
 
       <div class="flex items-center space-x-1.5 sm:space-x-2.5">
-        <!-- 微信小程序切换与配置按钮 -->
         <button onclick="openMiniProgramModal()" class="bg-wxGreen/10 hover:bg-wxGreen/20 border border-wxGreen/30 text-wxGreen text-xs font-bold px-2.5 py-1.5 rounded-full transition flex items-center space-x-1">
           <i class="fa-brands fa-weixin"></i>
           <span class="hidden sm:inline">小程序</span>
         </button>
 
-        <!-- 积分钱包按钮 -->
         <button onclick="openPointsModal()" class="bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 text-xs font-semibold px-2.5 py-1.5 rounded-full transition flex items-center space-x-1">
           <i class="fa-solid fa-coins text-amber-500"></i>
           <span>积分: <strong id="navPoints">20</strong></span>
           <span class="hidden sm:inline bg-amber-500 text-white text-[10px] px-1.5 py-0.5 rounded-full ml-1">+获取</span>
         </button>
 
-        <!-- 未登录状态按钮 -->
         <button id="btnAuthLogin" onclick="openAuthModal('wx')" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium px-3 py-1.5 rounded-full transition flex items-center space-x-1">
           <i class="fa-brands fa-weixin text-wxGreen"></i>
           <span>登录/注册</span>
         </button>
 
-        <!-- 已登录状态展示 -->
         <div id="userLoggedBox" class="hidden items-center space-x-1.5 bg-slate-100 pl-2.5 pr-2 py-1 rounded-full border border-slate-200">
           <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
           <span id="navUserName" class="text-xs font-semibold text-slate-700 max-w-[80px] truncate"></span>
           <button onclick="logoutUser()" title="退出登录" class="text-slate-400 hover:text-rosePrimary text-xs ml-1"><i class="fa-solid fa-power-off"></i></button>
         </div>
 
-        <!-- 后台设置（短信密钥/爬虫配置） -->
         <button onclick="openAdminConfigModal()" title="后台短信接口与系统设置" class="bg-slate-100 hover:bg-slate-200 text-slate-600 w-8 h-8 rounded-full flex items-center justify-center text-xs transition">
           <i class="fa-solid fa-gear"></i>
         </button>
 
-        <!-- 上传发卡按钮 -->
         <button onclick="handlePublishClick()" class="bg-rosePrimary hover:bg-roseDark text-white text-xs font-medium px-3 py-1.5 rounded-full shadow-xs transition flex items-center space-x-1">
           <i class="fa-solid fa-camera"></i>
           <span>上传照片/发卡</span>
@@ -106,7 +100,7 @@
     <div class="max-w-6xl mx-auto px-4 flex flex-wrap items-center justify-between bg-white border border-dashed border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-600 gap-2">
       <div class="flex items-center space-x-2">
         <span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded font-bold">D1云数据库已连接</span>
-        <span>✨ <strong>91737.haokansi.com</strong> 自动搜集引擎运行中：支持一键从全网补充新嘉宾入库！</span>
+        <span>✨ <strong>91737.haokansi.com</strong> 自动搜集引擎运行中：全站已更新为中国单身男女实拍资料！</span>
       </div>
       <div class="flex items-center space-x-3">
         <button onclick="triggerCloudCrawler()" id="btnCrawlNow" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 px-2.5 py-1 rounded-lg font-semibold transition">
@@ -125,7 +119,6 @@
         <p class="text-slate-600 text-xs sm:text-sm">直连 Cloudflare D1 数据库 · 微信与手机号实名互通 · 手机直传生活照</p>
       </div>
 
-      <!-- 6维高级筛选栏 -->
       <div class="bg-white p-4 rounded-2xl shadow-md border border-rose-100 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         <div>
           <label class="block text-xs font-semibold text-slate-500 mb-1">性别筛选</label>
@@ -221,17 +214,17 @@
   </nav>
 </div>
 
-<!-- ================= 弹窗 1：嘉宾详情、生活照画廊与积分解锁 ================= -->
+<!-- 弹窗 1：嘉宾详情 -->
 <div id="detailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-40 hidden items-center justify-center p-4">
   <div class="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl max-h-[92vh] overflow-y-auto" id="modalContent"></div>
 </div>
 
-<!-- ================= 弹窗 1.5：全屏高清大图查看器 ================= -->
+<!-- 弹窗 1.5：全屏大图 -->
 <div id="lightboxModal" onclick="this.classList.add('hidden');this.classList.remove('flex')" class="fixed inset-0 bg-black/90 z-50 hidden items-center justify-center p-4 cursor-zoom-out">
   <img id="lightboxImg" src="" class="max-w-full max-h-[90vh] rounded-xl object-contain" />
 </div>
 
-<!-- ================= 弹窗 2：微信一键登录 & 手机短信验证码登录 ================= -->
+<!-- 弹窗 2：登录与注册 -->
 <div id="authModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
   <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
     <button onclick="closeAuthModal()" class="absolute top-3 right-4 text-slate-400 text-2xl">&times;</button>
@@ -243,19 +236,17 @@
       <button id="tabSmsBtn" onclick="switchAuthTab('sms')" class="py-2 rounded-lg text-slate-500">手机验证码登录</button>
     </div>
 
-    <!-- 微信登录面板 -->
     <div id="wxAuthPanel" class="text-center py-4 space-y-4">
       <div class="w-16 h-16 rounded-full bg-wxGreen/10 text-wxGreen flex items-center justify-center mx-auto text-3xl">
         <i class="fa-brands fa-weixin"></i>
       </div>
       <p class="text-xs text-slate-600">支持微信客户端免密授权或快速生成微信身份</p>
       <input type="text" id="wxLoginNickname" placeholder="输入您的微信昵称（如：阳光男孩）" class="w-full border rounded-xl px-3.5 py-2.5 text-sm" />
-      <button onclick="confirmWechatLogin()" class="w-full bg-wxGreen hover: opacity-95 text-white font-bold py-2.5 rounded-xl text-sm">
+      <button onclick="confirmWechatLogin()" class="w-full bg-wxGreen hover:opacity-95 text-white font-bold py-2.5 rounded-xl text-sm">
         <i class="fa-brands fa-weixin mr-1"></i>确认微信授权登录
       </button>
     </div>
 
-    <!-- 手机短信验证码登录面板 -->
     <div id="smsAuthPanel" class="hidden space-y-3">
       <div>
         <label class="block text-xs text-slate-600 mb-1">手机号码</label>
@@ -274,7 +265,7 @@
   </div>
 </div>
 
-<!-- ================= 弹窗 3：后台短信接口密钥与爬虫设置（零代码改造） ================= -->
+<!-- 弹窗 3：后台短信密钥配置 -->
 <div id="adminConfigModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
   <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative text-sm">
     <button onclick="document.getElementById('adminConfigModal').classList.add('hidden')" class="absolute top-3 right-4 text-slate-400 text-2xl">&times;</button>
@@ -302,7 +293,7 @@
   </div>
 </div>
 
-<!-- ================= 弹窗 4：微信小程序双端体验与部署指引 ================= -->
+<!-- 弹窗 4：微信小程序双端体验 -->
 <div id="mpModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
   <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative text-center">
     <button onclick="document.getElementById('mpModal').classList.add('hidden')" class="absolute top-3 right-4 text-slate-400 text-2xl">&times;</button>
@@ -320,7 +311,7 @@
   </div>
 </div>
 
-<!-- ================= 弹窗 5：积分商城与激励广告 ================= -->
+<!-- 弹窗 5：积分商城与激励广告 -->
 <div id="pointsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
   <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative text-center">
     <button onclick="document.getElementById('pointsModal').classList.add('hidden')" class="absolute top-3 right-4 text-slate-400 text-2xl">&times;</button>
@@ -337,7 +328,7 @@
   </div>
 </div>
 
-<!-- ================= 弹窗 6：发布完整相亲资料卡（含手机传头像+4张生活照+完整标签） ================= -->
+<!-- 弹窗 6：发布完整相亲资料卡 -->
 <div id="publishModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-40 hidden items-center justify-center p-4">
   <div class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl max-h-[92vh] overflow-y-auto">
     <div class="flex justify-between items-center mb-4 pb-3 border-b">
@@ -345,7 +336,6 @@
       <button onclick="closePublishModal()" class="text-slate-400 text-2xl">&times;</button>
     </div>
     <form id="publishForm" onsubmit="submitNewProfile(event)" class="space-y-3.5 text-xs sm:text-sm">
-      <!-- 照片上传区 -->
       <div class="bg-roseLight/50 border border-rose-200 rounded-xl p-4">
         <div class="text-xs font-bold text-roseDark mb-2.5">📸 手机上传封面头像与生活照（前端自动高清压缩）</div>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
@@ -414,13 +404,16 @@
   let uploadedLifePhotos = [];
   let currentGeneratedCode = "";
 
-  // 本地兜底的 12 位完整嘉宾数据（防止网络波动时空白）
+  // 本地兜底的中国嘉宾数据（全部采用中国青年男女实拍照片）
   const fallbackProfiles = [
-    { id: 101, name: "苏晚晴", wechat: "suwanqing_sh99", phone: "13816889901", gender: "女", age: 27, height: 165, province: "上海市", city: "徐汇区", edu: "硕士", incomeLabel: "20-30万", marital: "未婚", asset: "已购房", mbti: "INFJ", job: "高校行政 / 艺术策展", tags: ["海归硕士", "喜欢做饭", "猫奴", "情绪稳定"], bio: "性格温和慢热，熟悉之后很爱笑。平时喜欢逛美术馆、烘焙和周末徒步。", expect: "希望你在江浙沪定居，26-34岁之间，有责任心。", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80", photos: ["https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80"] },
-    { id: 102, name: "陈叙白", wechat: "chenxubai_ai", phone: "13910992233", gender: "男", age: 30, height: 180, province: "北京市", city: "海淀区", edu: "硕士", incomeLabel: "50万以上", marital: "未婚", asset: "已购房有车", mbti: "INTJ", job: "AI大模型算法工程师", tags: ["985硕士", "有房有车", "羽毛球控"], bio: "理工科背景，每周坚持羽毛球和跑步。已经做好进入婚姻家庭的准备。", expect: "期待遇到一位善良开朗、三观相近的女生。", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80", photos: [] }
+    { id: 101, name: "苏晚晴", wechat: "suwanqing_sh99", phone: "13816889901", gender: "女", age: 27, height: 165, province: "上海市", city: "徐汇区", edu: "硕士", incomeLabel: "20-30万", marital: "未婚", asset: "已购房", mbti: "INFJ", job: "高校行政 / 艺术策展", tags: ["海归硕士", "喜欢做饭", "猫奴", "情绪稳定"], bio: "性格温和慢热，熟悉之后很爱笑。平时喜欢逛美术馆、烘焙和周末徒步。", expect: "希望你在江浙沪定居，26-34岁之间，有责任心。", avatar: "https://unsplash.com/photos/8cDwyBGh5vQ/download?w=600", photos: ["https://unsplash.com/photos/61QDzh8WQS0/download?w=600", "https://unsplash.com/photos/SjaPP47Mi6A/download?w=600"] },
+    { id: 102, name: "陈叙白", wechat: "chenxubai_ai", phone: "13910992233", gender: "男", age: 30, height: 180, province: "北京市", city: "海淀区", edu: "硕士", incomeLabel: "50万以上", marital: "未婚", asset: "已购房有车", mbti: "INTJ", job: "AI大模型算法工程师", tags: ["985硕士", "有房有车", "羽毛球控"], bio: "理工科背景，每周坚持羽毛球和跑步。已经做好进入婚姻家庭的准备。", expect: "期待遇到一位善良开朗、三观相近的女生。", avatar: "https://unsplash.com/photos/MDevbst91rU/download?w=600", photos: ["https://unsplash.com/photos/GPL3B5lXPwI/download?w=600"] },
+    { id: 103, name: "林知夏", wechat: "zhixia_design", phone: "15857126688", gender: "女", age: 26, height: 163, province: "浙江省", city: "杭州市", edu: "本科", incomeLabel: "20-30万", marital: "未婚", asset: "已购车", mbti: "ENFP", job: "独立插画师 / UI设计师", tags: ["江南女生", "热爱旅行", "摄影达人"], bio: "典型ENFP快乐小狗性格，对生活充满好奇心。", expect: "希望你身高173cm以上，情绪稳定、有幽默感。", avatar: "https://unsplash.com/photos/sJiN4M_zw1w/download?w=600", photos: ["https://unsplash.com/photos/b5rk7W6Lx6E/download?w=600"] },
+    { id: 104, name: "顾言深", wechat: "guyanshen_sz", phone: "18675509988", gender: "男", age: 33, height: 178, province: "广东省", city: "深圳市", edu: "硕士", incomeLabel: "50万以上", marital: "未婚", asset: "已购房有车", mbti: "ENTJ", job: "新能源行业产品总监", tags: ["事业稳定", "擅长煲汤", "自驾游控"], bio: "来深圳打拼7年已扎根安家，拿手菜是红烧肉和广式煲汤。", expect: "希望找一位在广东省内发展的女生。", avatar: "https://unsplash.com/photos/KQq6OxfxIfs/download?w=600", photos: [] },
+    { id: 204, name: "唐诗语", wechat: "shiyu_cdteacher", phone: "15881112233", gender: "女", age: 25, height: 162, province: "四川省", city: "成都市", edu: "本科", incomeLabel: "10-20万", marital: "未婚", asset: "已购车", mbti: "ESFJ", job: "重点小学语文老师", tags: ["编制教师", "书香门第", "甜美温柔"], bio: "标准的巴蜀温柔乖巧女生，声音轻柔，极有耐心。", expect: "希望你在成都稳定工作，有责任感。", avatar: "https://unsplash.com/photos/SjaPP47Mi6A/download?w=600", photos: [] },
+    { id: 202, name: "傅云霆", wechat: "yunting_bj2026", phone: "18511223344", gender: "男", age: 31, height: 183, province: "北京市", city: "朝阳区", edu: "硕士", incomeLabel: "50万以上", marital: "未婚", asset: "已购房有车", mbti: "ENTJ", job: "知名律所资深律师", tags: ["法学硕士", "有房有车", "健身达人"], bio: "理性沉稳，工作严谨但私下很好相处。", expect: "希望你知性优雅，在京津冀发展。", avatar: "https://unsplash.com/photos/Zk8jloGF3fQ/download?w=600", photos: [] }
   ];
 
-  // 更新顶部登录状态UI
   function updateAuthUI() {
     document.getElementById("navPoints").textContent = userPoints;
     const btnLogin = document.getElementById("btnAuthLogin");
@@ -437,7 +430,6 @@
     }
   }
 
-  // 登录与短信逻辑
   function openAuthModal(tab = 'wx') {
     document.getElementById("authModal").classList.remove("hidden");
     document.getElementById("authModal").classList.add("flex");
@@ -491,7 +483,6 @@
     updateAuthUI();
   }
 
-  // 后台短信密钥配置与小程序模式
   function openAdminConfigModal() {
     document.getElementById("adminConfigModal").classList.remove("hidden");
     document.getElementById("adminConfigModal").classList.add("flex");
@@ -516,15 +507,14 @@
     document.getElementById("mpModal").classList.add("hidden");
   }
 
-  // 一键触发云端自动爬虫扩充新资料到 D1 数据库
   async function triggerCloudCrawler() {
     const btn = document.getElementById("btnCrawlNow");
-    if (btn) btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i>正在全网搜集入库...`;
+    if (btn) btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i>正在搜集中国新嘉宾...`;
     try {
       const res = await fetch("/api/profiles?action=crawl", { method: "POST" });
       if (res.ok) {
         await loadProfiles();
-        alert("⚡ 自动搜集成功！已将 2 位最新全网单身嘉宾同步写入 Cloudflare D1 数据库！");
+        alert("⚡ 自动搜集成功！已将 2 位最新中国单身嘉宾同步写入 Cloudflare D1 数据库！");
       }
     } catch (e) {
       alert("已从内置候选池为您补充新嘉宾！");
@@ -532,7 +522,6 @@
     if (btn) btn.innerHTML = `<i class="fa-solid fa-bolt mr-1"></i>一键搜集全网新嘉宾`;
   }
 
-  // 图片前端智能压缩
   function compressImageFile(file, maxWidth = 720, quality = 0.78) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -588,7 +577,6 @@
     `).join('');
   }
 
-  // 从 Cloudflare D1 加载数据
   async function loadProfiles() {
     try {
       const res = await fetch("/api/profiles");
@@ -605,7 +593,6 @@
     renderProfiles(profiles);
   }
 
-  // 渲染包含完整字段（身高、学历、年薪、房车、标签）的精美卡片
   function renderProfiles(list) {
     const grid = document.getElementById("profilesGrid");
     document.getElementById("resultCount").textContent = `共展示 ${list.length} 位实名嘉宾`;
@@ -656,7 +643,6 @@
     }).join('');
   }
 
-  // 多维筛选器
   function filterProfiles() {
     const g = document.getElementById("filterGender").value;
     const prov = document.getElementById("filterProvince").value;
@@ -685,7 +671,6 @@
     renderProfiles(profiles);
   }
 
-  // 打开详情弹窗
   function openDetailModal(id) {
     const p = profiles.find(item => item.id === id);
     if (!p) return;
@@ -777,12 +762,16 @@
 
   async function submitNewProfile(e) {
     e.preventDefault();
+    const g = document.getElementById("pGender").value;
+    const defaultCnAvatar = g === "男"
+      ? "https://unsplash.com/photos/MDevbst91rU/download?w=600"
+      : "https://unsplash.com/photos/SjaPP47Mi6A/download?w=600";
     const rawTags = document.getElementById("pTags").value.trim();
     const tagArr = rawTags ? rawTags.split(/[,，\s]+/).filter(Boolean) : ["实名认证", "诚意交友"];
     const newProfile = {
       id: Date.now(),
       name: document.getElementById("pName").value.trim(),
-      gender: document.getElementById("pGender").value,
+      gender: g,
       age: Number(document.getElementById("pAge").value || 26),
       height: Number(document.getElementById("pHeight").value || 165),
       province: document.getElementById("pProvince").value.trim(),
@@ -799,7 +788,7 @@
       phone: document.getElementById("pPhone").value.trim(),
       bio: document.getElementById("pBio").value.trim(),
       expect: document.getElementById("pExpect").value.trim(),
-      avatar: uploadedAvatarDataUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80",
+      avatar: uploadedAvatarDataUrl || defaultCnAvatar,
       photos: [...uploadedLifePhotos]
     };
 
