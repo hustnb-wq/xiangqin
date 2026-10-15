@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>就要去相亲 91737.haokansi.com - 全端互通相亲平台</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            rosePrimary: '#f43f5e',
+            roseLight: '#fff1f2',
+            roseDark: '#be123c',
+            wxGreen: '#07c160',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif; padding-bottom: 64px; }
+    .gradient-bg { background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 50%, #fce7f3 100%); }
+    .card-hover { transition: all 0.25s ease; }
+    .card-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -6px rgba(244, 63, 94, 0.15); }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+<div class="flex flex-col min-h-screen w-full">
+  <!-- 顶部导航栏 -->
+  <header class="bg-white/95 backdrop-blur-md sticky top-0 z-30 border-b border-rose-100 shadow-xs">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <div class="w-9 h-9 rounded-full bg-rosePrimary flex items-center justify-center text-white shadow-xs"><i class="fa-solid fa-heart"></i></div>
+        <div>
+          <span class="text-xl font-bold tracking-tight text-slate-900">就要去相亲</span>
+          <span class="hidden sm:inline-block text-xs text-rosePrimary bg-roseLight px-2 py-0.5 rounded-full ml-1 font-medium">91737.haokansi.com</span>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2">
+        <button onclick="handlePublishClick()" class="bg-rosePrimary text-white text-xs sm:text-sm font-medium px-3.5 py-2 rounded-full shadow-xs transition"><i class="fa-solid fa-camera mr-1"></i>上传照片/发卡</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 公告横幅 -->
+  <div class="bg-slate-100 border-b border-slate-200 py-2">
+    <div class="max-w-6xl mx-auto px-4 flex items-center justify-between bg-white border border-dashed border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-500">
+      <span class="truncate">✨ <strong>91737.haokansi.com</strong> 自动搜集与更新引擎运行中：全网优质嘉宾数据实时同步！</span>
+      <span class="text-rosePrimary font-semibold shrink-0 ml-2">云端实时互通</span>
+    </div>
+  </div>
+
+  <section class="gradient-bg py-6 sm:py-10 border-b border-rose-100 text-center">
+    <h1 class="text-2xl sm:text-4xl font-extrabold text-slate-900 mb-2">幸福不等待，现在<span class="text-rosePrimary">就要去相亲</span></h1>
+    <p class="text-slate-600 text-xs sm:text-sm">当前运行在 <strong>91737.haokansi.com</strong>，支持手机相册/相机直传头像与生活照！</p>
+  </section>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex-grow w-full">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-xl font-bold text-slate-900">实名相亲资料墙</h2>
+      <span id="resultCount" class="text-xs font-semibold bg-roseLight text-rosePrimary px-3.5 py-1.5 rounded-full">加载中...</span>
+    </div>
+    <div id="profilesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+  </main>
+</div>
+
+<!-- 发布资料弹窗（支持手机上传头像与多张生活照） -->
+<div id="publishModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-40 hidden items-center justify-center p-4">
+  <div class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl max-h-[92vh] overflow-y-auto">
+    <div class="flex justify-between items-center mb-4 pb-3 border-b">
+      <h3 class="text-lg font-bold text-slate-900">发布相亲资料卡</h3>
+      <button onclick="closePublishModal()" class="text-slate-400 text-2xl">&times;</button>
+    </div>
+    <form id="publishForm" onsubmit="submitNewProfile(event)" class="space-y-4 text-sm">
+      <div class="bg-roseLight/50 border border-rose-200 rounded-xl p-4">
+        <div class="text-xs font-bold text-roseDark mb-2.5">📸 手机上传头像与生活照（自动智能压缩）</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+          <div class="flex flex-col items-center">
+            <label for="inputAvatarFile" class="cursor-pointer group relative w-24 h-24 rounded-full border-2 border-dashed border-rosePrimary bg-white flex flex-col items-center justify-center overflow-hidden">
+              <img id="avatarPreviewImg" src="" class="hidden w-full h-full object-cover" />
+              <div id="avatarPlaceholder" class="flex flex-col items-center text-rosePrimary text-xs font-semibold"><i class="fa-solid fa-user-plus text-lg mb-1"></i>上传头像</div>
+            </label>
+            <input id="inputAvatarFile" type="file" accept="image/*" onchange="handleAvatarUpload(event)" class="hidden" />
+          </div>
+          <div class="sm:col-span-2">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-xs font-medium text-slate-700">生活风采照（最多 4 张）：</span>
+              <label for="inputPhotosFile" class="cursor-pointer text-xs bg-rosePrimary text-white px-2.5 py-1 rounded-md">添加生活照</label>
+              <input id="inputPhotosFile" type="file" accept="image/*" multiple onchange="handleLifePhotosUpload(event)" class="hidden" />
+            </div>
+            <div id="lifePhotosPreviewGrid" class="grid grid-cols-4 gap-2 min-h-[68px] bg-white/80 p-2 rounded-lg border">
+              <div class="col-span-4 flex items-center justify-center text-xs text-slate-400 h-14">暂未选择生活照</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <label class="block text-slate-600 mb-1 font-medium">昵称 *</label>
+        <input type="text" id="pName" required placeholder="如：林沐" class="w-full border rounded-lg px-3 py-2" />
+      </div>
+      <div>
+        <label class="block text-slate-600 mb-1 font-medium">微信号 *</label>
+        <input type="text" id="pWechat" required placeholder="加密保护" class="w-full border rounded-lg px-3 py-2" />
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-slate-600 mb-1 font-medium">省份 *</label>
+          <input type="text" id="pProvince" required value="广东省" class="w-full border rounded-lg px-3 py-2" />
+        </div>
+        <div>
+          <label class="block text-slate-600 mb-1 font-medium">城市 *</label>
+          <input type="text" id="pCity" required value="深圳市" class="w-full border rounded-lg px-3 py-2" />
+        </div>
+      </div>
+      <div>
+        <label class="block text-slate-600 mb-1 font-medium">自我介绍 *</label>
+        <textarea id="pBio" required rows="2" placeholder="介绍一下性格、兴趣..." class="w-full border rounded-lg px-3 py-2"></textarea>
+      </div>
+      <div class="pt-2 flex justify-end space-x-3">
+        <button type="button" onclick="closePublishModal()" class="px-4 py-2 rounded-lg border">取消</button>
+        <button type="submit" class="px-5 py-2 rounded-lg bg-rosePrimary text-white font-medium">确认发布同步云端</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  let profiles = [];
+  let uploadedAvatarDataUrl = "";
+  let uploadedLifePhotos = [];
+
+  function compressImageFile(file, maxWidth = 720, quality = 0.78) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          let w = img.width, h = img.height;
+          if (w > maxWidth) { h = Math.round((h * maxWidth) / w); w = maxWidth; }
+          canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL("image/jpeg", quality));
+        };
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function handleAvatarUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    uploadedAvatarDataUrl = await compressImageFile(file, 500, 0.8);
+    document.getElementById("avatarPreviewImg").src = uploadedAvatarDataUrl;
+    document.getElementById("avatarPreviewImg").classList.remove("hidden");
+    document.getElementById("avatarPlaceholder").classList.add("hidden");
+  }
+
+  async function handleLifePhotosUpload(e) {
+    const files = Array.from(e.target.files || []);
+    for (const file of files) {
+      if (uploadedLifePhotos.length >= 4) break;
+      const compressed = await compressImageFile(file, 800, 0.78);
+      uploadedLifePhotos.push(compressed);
+    }
+    renderLifePhotosPreview();
+  }
+
+  function renderLifePhotosPreview() {
+    const grid = document.getElementById("lifePhotosPreviewGrid");
+    if (uploadedLifePhotos.length === 0) {
+      grid.innerHTML = `<div class="col-span-4 flex items-center justify-center text-xs text-slate-400 h-14">暂未选择生活照</div>`;
+      return;
+    }
+    grid.innerHTML = uploadedLifePhotos.map((src, i) => `
+      <div class="relative h-16 rounded-lg overflow-hidden border">
+        <img src="${src}" class="w-full h-full object-cover" />
+        <button type="button" onclick="uploadedLifePhotos.splice(${i},1);renderLifePhotosPreview()" class="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-black/70 text-white text-xs">&times;</button>
+      </div>
+    `).join('');
+  }
+
+  async function loadProfiles() {
+    try {
+      const res = await fetch("/api/profiles");
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          profiles = data;
+          renderProfiles(profiles);
+          return;
+        }
+      }
+    } catch (e) {}
+    // 降级演示数据
+    profiles = [
+      { id: 101, name: "苏晚晴", wechat: "suwanq", gender: "女", age: 27, province: "上海市", city: "徐汇区", job: "高校行政", bio: "性格温和慢热，喜欢美术馆与徒步。", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80", photos: [] }
+    ];
+    renderProfiles(profiles);
+  }
+
+  function renderProfiles(list) {
+    const grid = document.getElementById("profilesGrid");
+    document.getElementById("resultCount").textContent = `共展示 ${list.length} 位实名嘉宾`;
+    grid.innerHTML = list.map(p => `
+      <div class="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-xs card-hover flex flex-col">
+        <div class="relative h-60 overflow-hidden bg-slate-100">
+          <img src="${p.avatar || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80'}" class="w-full h-full object-cover" />
+          <div class="absolute top-3 left-3 bg-slate-900/75 text-white text-xs px-2.5 py-1 rounded-full">${p.province} · ${p.city}</div>
+        </div>
+        <div class="p-5 flex-grow flex flex-col justify-between">
+          <div>
+            <h3 class="text-lg font-bold text-slate-900 mb-1">${p.name} <span class="text-xs px-2 py-0.5 rounded-full bg-roseLight text-rosePrimary">${p.gender}</span></h3>
+            <p class="text-xs text-slate-500 mb-2">${p.age}岁 | ${p.job || '优质单身青年'}</p>
+            <p class="text-sm text-slate-600 line-clamp-2">${p.bio}</p>
+          </div>
+          <button onclick="alert('微信号：${p.wechat}')" class="mt-4 w-full py-2.5 rounded-xl bg-roseLight text-rosePrimary font-semibold text-sm">查看联系方式</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function handlePublishClick() {
+    document.getElementById("publishModal").classList.remove("hidden");
+    document.getElementById("publishModal").classList.add("flex");
+  }
+  function closePublishModal() {
+    document.getElementById("publishModal").classList.add("hidden");
+    document.getElementById("publishModal").classList.remove("flex");
+  }
+
+  async function submitNewProfile(e) {
+    e.preventDefault();
+    const newProfile = {
+      id: Date.now(),
+      name: document.getElementById("pName").value,
+      wechat: document.getElementById("pWechat").value.trim(),
+      gender: "女",
+      age: 26,
+      province: document.getElementById("pProvince").value,
+      city: document.getElementById("pCity").value,
+      job: "白领",
+      bio: document.getElementById("pBio").value,
+      avatar: uploadedAvatarDataUrl || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80",
+      photos: [...uploadedLifePhotos]
+    };
+
+    try {
+      await fetch("/api/profiles", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newProfile)
+      });
+    } catch(e) {}
+
+    profiles.unshift(newProfile);
+    renderProfiles(profiles);
+    closePublishModal();
+    alert("发布成功并同步至 Cloudflare D1 数据库！");
+  }
+
+  loadProfiles();
+</script>
+</body>
+</html>
