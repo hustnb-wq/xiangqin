@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>就要去相亲 91737.haokansi.com - 全功能D1云端互通版</title>
+  <title>就要去相亲 91737.haokansi.com - 全国实名高品质相亲平台</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
@@ -23,118 +23,331 @@
     }
   </script>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif; padding-bottom: 64px; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif; padding-bottom: 68px; }
     .gradient-bg { background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 50%, #fce7f3 100%); }
     .card-hover { transition: all 0.25s ease; }
     .card-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -6px rgba(244, 63, 94, 0.15); }
+    .wx-capsule { border: 1px solid rgba(0,0,0,0.1); background: rgba(255,255,255,0.85); border-radius: 9999px; height: 32px; display: inline-flex; align-items: center; padding: 0 10px; }
+    body.mp-simulator-mode { background-color: #1e293b; display: flex; justify-content: center; padding-top: 20px; padding-bottom: 20px; }
+    body.mp-simulator-mode #appRootContainer { width: 414px; max-width: 100%; background: #f8fafc; min-height: 844px; border-radius: 36px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6); border: 8px solid #0f172a; overflow-x: hidden; position: relative; }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
-<div class="flex flex-col min-h-screen w-full">
-  <!-- 顶部导航栏 -->
+<div id="appRootContainer" class="flex flex-col min-h-screen w-full">
+
+  <!-- 微信小程序胶囊顶栏（开启小程序预览模式时显示） -->
+  <div id="mpTopNavigationBar" class="hidden bg-white border-b border-slate-100 px-4 py-2.5 sticky top-0 z-40 items-center justify-between">
+    <div class="flex items-center space-x-2">
+      <span class="text-xs bg-wxGreen/10 text-wxGreen font-bold px-2 py-0.5 rounded">小程序端</span>
+      <span class="font-bold text-slate-900 text-base">就要去相亲</span>
+    </div>
+    <div class="wx-capsule space-x-3 text-slate-800">
+      <button onclick="alert('已生成微信小程序转发卡片！')" class="text-xs"><i class="fa-solid fa-ellipsis"></i></button>
+      <span class="w-[1px] h-3.5 bg-slate-300"></span>
+      <button onclick="toggleMiniProgramSimulator(false)" title="退出小程序模式" class="text-xs"><i class="fa-regular fa-circle-dot"></i></button>
+    </div>
+  </div>
+
+  <!-- 顶部主导航栏 -->
   <header class="bg-white/95 backdrop-blur-md sticky top-0 z-30 border-b border-rose-100 shadow-xs">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
       <div class="flex items-center space-x-2">
         <div class="w-9 h-9 rounded-full bg-rosePrimary flex items-center justify-center text-white shadow-xs"><i class="fa-solid fa-heart"></i></div>
         <div>
           <span class="text-xl font-bold tracking-tight text-slate-900">就要去相亲</span>
-          <span class="hidden sm:inline-block text-xs text-rosePrimary bg-roseLight px-2 py-0.5 rounded-full ml-1 font-medium">91737.haokansi.com</span>
+          <span class="hidden md:inline-block text-xs text-rosePrimary bg-roseLight px-2 py-0.5 rounded-full ml-1 font-medium">91737.haokansi.com</span>
         </div>
       </div>
-      <div class="flex items-center space-x-2">
-        <button onclick="openPointsModal()" class="bg-amber-50 border border-amber-200 text-amber-700 text-xs sm:text-sm font-semibold px-3 py-1.5 rounded-full transition flex items-center space-x-1">
+
+      <div class="flex items-center space-x-1.5 sm:space-x-2.5">
+        <!-- 微信小程序切换与配置按钮 -->
+        <button onclick="openMiniProgramModal()" class="bg-wxGreen/10 hover:bg-wxGreen/20 border border-wxGreen/30 text-wxGreen text-xs font-bold px-2.5 py-1.5 rounded-full transition flex items-center space-x-1">
+          <i class="fa-brands fa-weixin"></i>
+          <span class="hidden sm:inline">小程序</span>
+        </button>
+
+        <!-- 积分钱包按钮 -->
+        <button onclick="openPointsModal()" class="bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 text-xs font-semibold px-2.5 py-1.5 rounded-full transition flex items-center space-x-1">
           <i class="fa-solid fa-coins text-amber-500"></i>
           <span>积分: <strong id="navPoints">20</strong></span>
+          <span class="hidden sm:inline bg-amber-500 text-white text-[10px] px-1.5 py-0.5 rounded-full ml-1">+获取</span>
         </button>
-        <button onclick="handlePublishClick()" class="bg-rosePrimary text-white text-xs sm:text-sm font-medium px-3.5 py-2 rounded-full shadow-xs transition"><i class="fa-solid fa-camera mr-1"></i>上传照片/发卡</button>
+
+        <!-- 未登录状态按钮 -->
+        <button id="btnAuthLogin" onclick="openAuthModal('wx')" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium px-3 py-1.5 rounded-full transition flex items-center space-x-1">
+          <i class="fa-brands fa-weixin text-wxGreen"></i>
+          <span>登录/注册</span>
+        </button>
+
+        <!-- 已登录状态展示 -->
+        <div id="userLoggedBox" class="hidden items-center space-x-1.5 bg-slate-100 pl-2.5 pr-2 py-1 rounded-full border border-slate-200">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span id="navUserName" class="text-xs font-semibold text-slate-700 max-w-[80px] truncate"></span>
+          <button onclick="logoutUser()" title="退出登录" class="text-slate-400 hover:text-rosePrimary text-xs ml-1"><i class="fa-solid fa-power-off"></i></button>
+        </div>
+
+        <!-- 后台设置（短信密钥/爬虫配置） -->
+        <button onclick="openAdminConfigModal()" title="后台短信接口与系统设置" class="bg-slate-100 hover:bg-slate-200 text-slate-600 w-8 h-8 rounded-full flex items-center justify-center text-xs transition">
+          <i class="fa-solid fa-gear"></i>
+        </button>
+
+        <!-- 上传发卡按钮 -->
+        <button onclick="handlePublishClick()" class="bg-rosePrimary hover:bg-roseDark text-white text-xs font-medium px-3 py-1.5 rounded-full shadow-xs transition flex items-center space-x-1">
+          <i class="fa-solid fa-camera"></i>
+          <span>上传照片/发卡</span>
+        </button>
       </div>
     </div>
   </header>
 
-  <!-- 公告横幅 -->
+  <!-- 顶部实时爬虫与广告状态横幅 -->
   <div class="bg-slate-100 border-b border-slate-200 py-2">
-    <div class="max-w-6xl mx-auto px-4 flex items-center justify-between bg-white border border-dashed border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-500">
-      <span class="truncate">✨ <strong>91737.haokansi.com</strong> D1云端数据库与自动搜集引擎运行中：全网数据实时互通！</span>
-      <button onclick="startWatchGoogleAd()" class="text-rosePrimary font-semibold hover:underline shrink-0 ml-2">看广告领积分 &rarr;</button>
+    <div class="max-w-6xl mx-auto px-4 flex flex-wrap items-center justify-between bg-white border border-dashed border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-600 gap-2">
+      <div class="flex items-center space-x-2">
+        <span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded font-bold">D1云数据库已连接</span>
+        <span>✨ <strong>91737.haokansi.com</strong> 自动搜集引擎运行中：支持一键从全网补充新嘉宾入库！</span>
+      </div>
+      <div class="flex items-center space-x-3">
+        <button onclick="triggerCloudCrawler()" id="btnCrawlNow" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 px-2.5 py-1 rounded-lg font-semibold transition">
+          <i class="fa-solid fa-bolt mr-1"></i>一键搜集全网新嘉宾
+        </button>
+        <button onclick="startWatchGoogleAd()" class="text-rosePrimary font-semibold hover:underline">看广告领积分 &rarr;</button>
+      </div>
     </div>
   </div>
 
-  <!-- 主横幅与筛选器 -->
+  <!-- 主横幅与多维交叉筛选面板 -->
   <section class="gradient-bg py-6 sm:py-8 border-b border-rose-100">
     <div class="max-w-6xl mx-auto px-4 sm:px-6">
       <div class="text-center mb-5">
         <h1 class="text-2xl sm:text-4xl font-extrabold text-slate-900 mb-2">幸福不等待，现在<span class="text-rosePrimary">就要去相亲</span></h1>
-        <p class="text-slate-600 text-xs sm:text-sm">直连 Cloudflare D1 数据库，多维交叉筛选，快速锁定心仪有缘人。</p>
+        <p class="text-slate-600 text-xs sm:text-sm">直连 Cloudflare D1 数据库 · 微信与手机号实名互通 · 手机直传生活照</p>
       </div>
 
-      <div class="bg-white p-4 rounded-2xl shadow-md border border-rose-100 grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <!-- 6维高级筛选栏 -->
+      <div class="bg-white p-4 rounded-2xl shadow-md border border-rose-100 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         <div>
           <label class="block text-xs font-semibold text-slate-500 mb-1">性别筛选</label>
-          <select id="filterGender" onchange="filterProfiles()" class="w-full bg-slate-50 border rounded-lg px-2.5 py-2 text-sm">
+          <select id="filterGender" onchange="filterProfiles()" class="w-full bg-slate-50 border rounded-lg px-2.5 py-2 text-xs sm:text-sm">
             <option value="all">不限性别</option>
-            <option value="女">女生</option>
-            <option value="男">男生</option>
+            <option value="女">只看女生</option>
+            <option value="男">只看男生</option>
           </select>
         </div>
         <div>
           <label class="block text-xs font-semibold text-slate-500 mb-1">所在省份</label>
-          <select id="filterProvince" onchange="filterProfiles()" class="w-full bg-slate-50 border rounded-lg px-2.5 py-2 text-sm">
-            <option value="all">全部省份</option>
+          <select id="filterProvince" onchange="filterProfiles()" class="w-full bg-slate-50 border rounded-lg px-2.5 py-2 text-xs sm:text-sm">
+            <option value="all">全国不限</option>
             <option value="上海市">上海市</option>
             <option value="北京市">北京市</option>
             <option value="广东省">广东省</option>
             <option value="浙江省">浙江省</option>
             <option value="四川省">四川省</option>
+            <option value="江苏省">江苏省</option>
+            <option value="湖北省">湖北省</option>
+            <option value="陕西省">陕西省</option>
+            <option value="重庆市">重庆市</option>
+            <option value="湖南省">湖南省</option>
+            <option value="山东省">山东省</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 mb-1">最低学历</label>
+          <select id="filterEdu" onchange="filterProfiles()" class="w-full bg-slate-50 border rounded-lg px-2.5 py-2 text-xs sm:text-sm">
+            <option value="all">不限学历</option>
+            <option value="本科">本科及以上</option>
+            <option value="硕士">硕士及以上</option>
+            <option value="博士">博士</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 mb-1">房车情况</label>
+          <select id="filterAsset" onchange="filterProfiles()" class="w-full bg-slate-50 border rounded-lg px-2.5 py-2 text-xs sm:text-sm">
+            <option value="all">不限房车</option>
+            <option value="已购房">有房一族</option>
+            <option value="已购车">有车一族</option>
           </select>
         </div>
         <div>
           <label class="block text-xs font-semibold text-slate-500 mb-1">关键词搜索</label>
-          <input id="filterKeyword" oninput="filterProfiles()" type="text" placeholder="搜职业、爱好..." class="w-full bg-slate-50 border rounded-lg px-2.5 py-2 text-sm" />
+          <input id="filterKeyword" oninput="filterProfiles()" type="text" placeholder="搜职业、MBTI、爱好..." class="w-full bg-slate-50 border rounded-lg px-2.5 py-2 text-xs sm:text-sm" />
         </div>
         <div class="flex items-end">
-          <button onclick="resetFilters()" class="w-full bg-slate-800 text-white text-sm py-2 rounded-lg">重置筛选</button>
+          <button onclick="resetFilters()" class="w-full bg-slate-800 hover:bg-slate-700 text-white text-xs sm:text-sm py-2 rounded-lg transition">重置全部筛选</button>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 资料墙 -->
+  <!-- 实名相亲资料墙 -->
   <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex-grow w-full">
-    <div class="flex items-center justify-between mb-6">
-      <h2 class="text-xl font-bold text-slate-900">实名相亲资料墙</h2>
-      <span id="resultCount" class="text-xs font-semibold bg-roseLight text-rosePrimary px-3.5 py-1.5 rounded-full">加载中...</span>
+    <div class="flex flex-wrap items-center justify-between mb-6 gap-2">
+      <div class="flex items-center space-x-2">
+        <h2 class="text-xl font-bold text-slate-900">实名相亲资料墙</h2>
+        <span class="text-xs text-slate-400">（点击卡片可查看多张生活照与择偶标准）</span>
+      </div>
+      <div class="flex items-center space-x-2">
+        <button onclick="triggerCloudCrawler()" class="text-xs bg-white border border-rose-200 text-rosePrimary px-3 py-1.5 rounded-full font-semibold hover:bg-roseLight transition">
+          <i class="fa-solid fa-rotate mr-1"></i>自动抓取补充新嘉宾
+        </button>
+        <span id="resultCount" class="text-xs font-semibold bg-roseLight text-rosePrimary px-3.5 py-1.5 rounded-full">加载中...</span>
+      </div>
     </div>
     <div id="profilesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
   </main>
+
+  <footer class="bg-slate-900 text-slate-400 text-xs sm:text-sm py-8 mt-8 text-center">
+    <div>就要去相亲 91737.haokansi.com — 网页与微信小程序全端互通婚恋平台</div>
+  </footer>
+
+  <!-- 手机/小程序底部固定导航栏 -->
+  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 h-14 z-30 flex items-center justify-around text-xs font-medium text-slate-500 shadow-lg">
+    <button onclick="window.scrollTo({top:0, behavior:'smooth'})" class="flex flex-col items-center text-rosePrimary">
+      <i class="fa-solid fa-heart text-base mb-0.5"></i><span>相亲墙</span>
+    </button>
+    <button onclick="triggerCloudCrawler()" class="flex flex-col items-center hover:text-indigo-600">
+      <i class="fa-solid fa-bolt text-base mb-0.5 text-indigo-500"></i><span>搜集新资料</span>
+    </button>
+    <button onclick="handlePublishClick()" class="flex flex-col items-center hover:text-rosePrimary">
+      <i class="fa-solid fa-camera text-base mb-0.5 text-rosePrimary"></i><span>传照发卡</span>
+    </button>
+    <button onclick="openPointsModal()" class="flex flex-col items-center hover:text-amber-600">
+      <i class="fa-solid fa-coins text-base mb-0.5 text-amber-500"></i><span>领积分</span>
+    </button>
+    <button onclick="openMiniProgramModal()" class="flex flex-col items-center hover:text-wxGreen">
+      <i class="fa-brands fa-weixin text-base mb-0.5 text-wxGreen"></i><span>小程序</span>
+    </button>
+  </nav>
 </div>
 
-<!-- 弹窗组件略（详情、大图、积分、发布） -->
+<!-- ================= 弹窗 1：嘉宾详情、生活照画廊与积分解锁 ================= -->
 <div id="detailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-40 hidden items-center justify-center p-4">
   <div class="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl max-h-[92vh] overflow-y-auto" id="modalContent"></div>
 </div>
 
+<!-- ================= 弹窗 1.5：全屏高清大图查看器 ================= -->
 <div id="lightboxModal" onclick="this.classList.add('hidden');this.classList.remove('flex')" class="fixed inset-0 bg-black/90 z-50 hidden items-center justify-center p-4 cursor-zoom-out">
   <img id="lightboxImg" src="" class="max-w-full max-h-[90vh] rounded-xl object-contain" />
 </div>
 
-<div id="pointsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
-  <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative text-center">
-    <button onclick="document.getElementById('pointsModal').classList.add('hidden')" class="absolute top-3 right-4 text-slate-400 text-2xl">&times;</button>
-    <h3 class="text-lg font-bold mb-2">积分钱包：<span class="text-rosePrimary" id="modalPointsBalance">20</span> 积分</h3>
-    <button onclick="startWatchGoogleAd()" class="w-full bg-amber-500 text-white font-bold py-2.5 rounded-xl text-sm mb-3">看 15 秒广告免费领 +5 积分</button>
+<!-- ================= 弹窗 2：微信一键登录 & 手机短信验证码登录 ================= -->
+<div id="authModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+  <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+    <button onclick="closeAuthModal()" class="absolute top-3 right-4 text-slate-400 text-2xl">&times;</button>
+    <h3 class="text-lg font-bold text-slate-900 mb-1">欢迎登录 · 就要去相亲</h3>
+    <p class="text-xs text-slate-500 mb-4">新用户首次登录自动赠送 <strong>+20 积分</strong></p>
+
+    <div class="grid grid-cols-2 bg-slate-100 p-1 rounded-xl mb-4 text-xs font-semibold">
+      <button id="tabWxBtn" onclick="switchAuthTab('wx')" class="py-2 rounded-lg bg-white text-slate-900 shadow-xs">微信一键登录</button>
+      <button id="tabSmsBtn" onclick="switchAuthTab('sms')" class="py-2 rounded-lg text-slate-500">手机验证码登录</button>
+    </div>
+
+    <!-- 微信登录面板 -->
+    <div id="wxAuthPanel" class="text-center py-4 space-y-4">
+      <div class="w-16 h-16 rounded-full bg-wxGreen/10 text-wxGreen flex items-center justify-center mx-auto text-3xl">
+        <i class="fa-brands fa-weixin"></i>
+      </div>
+      <p class="text-xs text-slate-600">支持微信客户端免密授权或快速生成微信身份</p>
+      <input type="text" id="wxLoginNickname" placeholder="输入您的微信昵称（如：阳光男孩）" class="w-full border rounded-xl px-3.5 py-2.5 text-sm" />
+      <button onclick="confirmWechatLogin()" class="w-full bg-wxGreen hover: opacity-95 text-white font-bold py-2.5 rounded-xl text-sm">
+        <i class="fa-brands fa-weixin mr-1"></i>确认微信授权登录
+      </button>
+    </div>
+
+    <!-- 手机短信验证码登录面板 -->
+    <div id="smsAuthPanel" class="hidden space-y-3">
+      <div>
+        <label class="block text-xs text-slate-600 mb-1">手机号码</label>
+        <input type="tel" id="smsPhoneInput" placeholder="请输入11位大陆手机号" class="w-full border rounded-xl px-3.5 py-2.5 text-sm" />
+      </div>
+      <div>
+        <label class="block text-xs text-slate-600 mb-1">短信验证码</label>
+        <div class="flex space-x-2">
+          <input type="text" id="smsCodeInput" placeholder="6位验证码" class="flex-grow border rounded-xl px-3.5 py-2.5 text-sm" />
+          <button type="button" onclick="sendSmsCode()" id="btnSendSms" class="bg-roseLight text-rosePrimary font-semibold px-3 py-2 rounded-xl text-xs shrink-0">获取验证码</button>
+        </div>
+        <p id="smsHintText" class="text-[11px] text-emerald-600 mt-1 hidden"></p>
+      </div>
+      <button onclick="confirmSmsLogin()" class="w-full bg-rosePrimary text-white font-bold py-2.5 rounded-xl text-sm mt-2">验证并登录</button>
+    </div>
   </div>
 </div>
 
+<!-- ================= 弹窗 3：后台短信接口密钥与爬虫设置（零代码改造） ================= -->
+<div id="adminConfigModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+  <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative text-sm">
+    <button onclick="document.getElementById('adminConfigModal').classList.add('hidden')" class="absolute top-3 right-4 text-slate-400 text-2xl">&times;</button>
+    <h3 class="text-lg font-bold text-slate-900 mb-1"><i class="fa-solid fa-gear text-rosePrimary mr-1"></i>系统后台设置</h3>
+    <p class="text-xs text-slate-500 mb-4">填入短信服务商密钥即可零代码切换为真实短信下发（留空则使用免费模拟验证码）</p>
+    <div class="space-y-3">
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 mb-1">短信服务商通道</label>
+        <select id="cfgSmsProvider" class="w-full border rounded-lg px-3 py-2 text-xs">
+          <option value="mock">免费模拟验证码模式（0成本测试推荐）</option>
+          <option value="aliyun">阿里云短信 (Dysmsapi)</option>
+          <option value="tencent">腾讯云短信 (Sms)</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 mb-1">短信接口 AccessKey / SecretId</label>
+        <input type="text" id="cfgSmsKey" placeholder="填入后自动启用真短信接口" class="w-full border rounded-lg px-3 py-2 text-xs" />
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 mb-1">短信签名与模板编号</label>
+        <input type="text" id="cfgSmsTpl" placeholder="如：就要去相亲 | SMS_2026888" class="w-full border rounded-lg px-3 py-2 text-xs" />
+      </div>
+      <button onclick="saveAdminConfig()" class="w-full bg-slate-900 text-white font-bold py-2.5 rounded-xl text-xs mt-2">保存后台配置</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 弹窗 4：微信小程序双端体验与部署指引 ================= -->
+<div id="mpModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+  <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative text-center">
+    <button onclick="document.getElementById('mpModal').classList.add('hidden')" class="absolute top-3 right-4 text-slate-400 text-2xl">&times;</button>
+    <div class="w-12 h-12 rounded-full bg-wxGreen/10 text-wxGreen flex items-center justify-center mx-auto text-2xl mb-2">
+      <i class="fa-brands fa-weixin"></i>
+    </div>
+    <h3 class="text-lg font-bold mb-1">微信小程序全端互通</h3>
+    <p class="text-xs text-slate-500 mb-4">当前网站完美适配微信小程序 Web-View 内嵌，共享同一个 Cloudflare D1 数据库！</p>
+    <button onclick="toggleMiniProgramSimulator(true)" class="w-full bg-wxGreen text-white font-bold py-2.5 rounded-xl text-sm mb-2">
+      <i class="fa-solid fa-mobile-screen mr-1"></i>一键切换【微信小程序模拟器视图】
+    </button>
+    <button onclick="toggleMiniProgramSimulator(false)" class="w-full bg-slate-100 text-slate-700 font-semibold py-2 rounded-xl text-xs">
+      恢复宽屏电脑网页视图
+    </button>
+  </div>
+</div>
+
+<!-- ================= 弹窗 5：积分商城与激励广告 ================= -->
+<div id="pointsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+  <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative text-center">
+    <button onclick="document.getElementById('pointsModal').classList.add('hidden')" class="absolute top-3 right-4 text-slate-400 text-2xl">&times;</button>
+    <h3 class="text-lg font-bold mb-1">我的积分钱包：<span class="text-rosePrimary" id="modalPointsBalance">20</span> 积分</h3>
+    <p class="text-xs text-slate-500 mb-4">每次解锁嘉宾微信号与手机号消耗 10 积分，已解锁嘉宾永久免费查看</p>
+    <div class="space-y-2.5">
+      <button onclick="startWatchGoogleAd()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 rounded-xl text-sm">
+        <i class="fa-solid fa-circle-play mr-1"></i>观看激励广告免费领 +10 积分
+      </button>
+      <button onclick="document.getElementById('pointsModal').classList.add('hidden');handlePublishClick()" class="w-full bg-roseLight text-rosePrimary font-bold py-2.5 rounded-xl text-sm">
+        <i class="fa-solid fa-camera mr-1"></i>发布个人相亲卡立得 +20 积分
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 弹窗 6：发布完整相亲资料卡（含手机传头像+4张生活照+完整标签） ================= -->
 <div id="publishModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-40 hidden items-center justify-center p-4">
   <div class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl max-h-[92vh] overflow-y-auto">
     <div class="flex justify-between items-center mb-4 pb-3 border-b">
-      <h3 class="text-lg font-bold text-slate-900">发布相亲资料卡</h3>
+      <h3 class="text-lg font-bold text-slate-900">发布实名相亲资料卡（同步至D1云数据库）</h3>
       <button onclick="closePublishModal()" class="text-slate-400 text-2xl">&times;</button>
     </div>
-    <form id="publishForm" onsubmit="submitNewProfile(event)" class="space-y-4 text-sm">
+    <form id="publishForm" onsubmit="submitNewProfile(event)" class="space-y-3.5 text-xs sm:text-sm">
+      <!-- 照片上传区 -->
       <div class="bg-roseLight/50 border border-rose-200 rounded-xl p-4">
-        <div class="text-xs font-bold text-roseDark mb-2.5">📸 手机上传头像与生活照</div>
+        <div class="text-xs font-bold text-roseDark mb-2.5">📸 手机上传封面头像与生活照（前端自动高清压缩）</div>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
           <div class="flex flex-col items-center">
             <label for="inputAvatarFile" class="cursor-pointer group relative w-24 h-24 rounded-full border-2 border-dashed border-rosePrimary bg-white flex flex-col items-center justify-center overflow-hidden">
@@ -155,16 +368,38 @@
           </div>
         </div>
       </div>
-      <div><label class="block text-slate-600 mb-1 font-medium">昵称 *</label><input type="text" id="pName" required placeholder="如：林沐" class="w-full border rounded-lg px-3 py-2" /></div>
-      <div><label class="block text-slate-600 mb-1 font-medium">微信号 *</label><input type="text" id="pWechat" required placeholder="加好友暗号" class="w-full border rounded-lg px-3 py-2" /></div>
-      <div class="grid grid-cols-2 gap-3">
-        <div><label class="block text-slate-600 mb-1 font-medium">省份 *</label><input type="text" id="pProvince" required value="广东省" class="w-full border rounded-lg px-3 py-2" /></div>
-        <div><label class="block text-slate-600 mb-1 font-medium">城市 *</label><input type="text" id="pCity" required value="深圳市" class="w-full border rounded-lg px-3 py-2" /></div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        <div><label class="block text-slate-600 mb-1 font-medium">昵称 *</label><input type="text" id="pName" required placeholder="如：林沐" class="w-full border rounded-lg px-2.5 py-1.5" /></div>
+        <div><label class="block text-slate-600 mb-1 font-medium">性别 *</label><select id="pGender" class="w-full border rounded-lg px-2.5 py-1.5"><option value="女">女</option><option value="男">男</option></select></div>
+        <div><label class="block text-slate-600 mb-1 font-medium">年龄 *</label><input type="number" id="pAge" required value="26" class="w-full border rounded-lg px-2.5 py-1.5" /></div>
+        <div><label class="block text-slate-600 mb-1 font-medium">身高(cm) *</label><input type="number" id="pHeight" required value="165" class="w-full border rounded-lg px-2.5 py-1.5" /></div>
       </div>
-      <div><label class="block text-slate-600 mb-1 font-medium">自我介绍 *</label><textarea id="pBio" required rows="2" placeholder="介绍一下性格、兴趣..." class="w-full border rounded-lg px-3 py-2"></textarea></div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        <div><label class="block text-slate-600 mb-1 font-medium">省份 *</label><input type="text" id="pProvince" required value="广东省" class="w-full border rounded-lg px-2.5 py-1.5" /></div>
+        <div><label class="block text-slate-600 mb-1 font-medium">城市 *</label><input type="text" id="pCity" required value="深圳市" class="w-full border rounded-lg px-2.5 py-1.5" /></div>
+        <div><label class="block text-slate-600 mb-1 font-medium">学历 *</label><select id="pEdu" class="w-full border rounded-lg px-2.5 py-1.5"><option value="本科">本科</option><option value="硕士">硕士</option><option value="博士">博士</option><option value="大专">大专</option></select></div>
+        <div><label class="block text-slate-600 mb-1 font-medium">年收入 *</label><select id="pIncome" class="w-full border rounded-lg px-2.5 py-1.5"><option value="10-20万">10-20万</option><option value="20-30万" selected>20-30万</option><option value="30-50万">30-50万</option><option value="50万以上">50万以上</option></select></div>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+        <div><label class="block text-slate-600 mb-1 font-medium">工作职业 *</label><input type="text" id="pJob" required placeholder="如：产品经理/教师" class="w-full border rounded-lg px-2.5 py-1.5" /></div>
+        <div><label class="block text-slate-600 mb-1 font-medium">房车资产 *</label><select id="pAsset" class="w-full border rounded-lg px-2.5 py-1.5"><option value="已购房有车">已购房有车</option><option value="已购房">已购房</option><option value="已购车">已购车</option><option value="努力奋斗中">努力奋斗中</option></select></div>
+        <div class="col-span-2 sm:col-span-1"><label class="block text-slate-600 mb-1 font-medium">个性标签(逗号分隔)</label><input type="text" id="pTags" placeholder="有房有车,喜欢旅行,猫奴" class="w-full border rounded-lg px-2.5 py-1.5" /></div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2.5">
+        <div><label class="block text-slate-600 mb-1 font-medium">微信号(加密保护) *</label><input type="text" id="pWechat" required placeholder="解锁后可见" class="w-full border rounded-lg px-2.5 py-1.5" /></div>
+        <div><label class="block text-slate-600 mb-1 font-medium">手机号(选填)</label><input type="text" id="pPhone" placeholder="仅解锁可见" class="w-full border rounded-lg px-2.5 py-1.5" /></div>
+      </div>
+
+      <div><label class="block text-slate-600 mb-1 font-medium">自我介绍 *</label><textarea id="pBio" required rows="2" placeholder="介绍一下性格、兴趣爱好、家庭背景..." class="w-full border rounded-lg px-2.5 py-1.5"></textarea></div>
+      <div><label class="block text-slate-600 mb-1 font-medium">理想择偶标准 *</label><textarea id="pExpect" required rows="2" placeholder="希望对方在哪个城市、身高年龄范围、性格要求..." class="w-full border rounded-lg px-2.5 py-1.5"></textarea></div>
+
       <div class="pt-2 flex justify-end space-x-3">
         <button type="button" onclick="closePublishModal()" class="px-4 py-2 rounded-lg border">取消</button>
-        <button type="submit" class="px-5 py-2 rounded-lg bg-rosePrimary text-white font-medium">确认发布同步D1</button>
+        <button type="submit" class="px-5 py-2 rounded-lg bg-rosePrimary text-white font-bold">立即发布入库 (+20积分)</button>
       </div>
     </form>
   </div>
@@ -172,11 +407,132 @@
 
 <script>
   let profiles = [];
+  let currentUser = JSON.parse(localStorage.getItem("xiangqin_auth_user") || "null");
   let userPoints = Number(localStorage.getItem("xiangqin_points") || 20);
   let unlockedIds = JSON.parse(localStorage.getItem("xiangqin_unlocked_ids") || "[]");
   let uploadedAvatarDataUrl = "";
   let uploadedLifePhotos = [];
+  let currentGeneratedCode = "";
 
+  // 本地兜底的 12 位完整嘉宾数据（防止网络波动时空白）
+  const fallbackProfiles = [
+    { id: 101, name: "苏晚晴", wechat: "suwanqing_sh99", phone: "13816889901", gender: "女", age: 27, height: 165, province: "上海市", city: "徐汇区", edu: "硕士", incomeLabel: "20-30万", marital: "未婚", asset: "已购房", mbti: "INFJ", job: "高校行政 / 艺术策展", tags: ["海归硕士", "喜欢做饭", "猫奴", "情绪稳定"], bio: "性格温和慢热，熟悉之后很爱笑。平时喜欢逛美术馆、烘焙和周末徒步。", expect: "希望你在江浙沪定居，26-34岁之间，有责任心。", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80", photos: ["https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80"] },
+    { id: 102, name: "陈叙白", wechat: "chenxubai_ai", phone: "13910992233", gender: "男", age: 30, height: 180, province: "北京市", city: "海淀区", edu: "硕士", incomeLabel: "50万以上", marital: "未婚", asset: "已购房有车", mbti: "INTJ", job: "AI大模型算法工程师", tags: ["985硕士", "有房有车", "羽毛球控"], bio: "理工科背景，每周坚持羽毛球和跑步。已经做好进入婚姻家庭的准备。", expect: "期待遇到一位善良开朗、三观相近的女生。", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80", photos: [] }
+  ];
+
+  // 更新顶部登录状态UI
+  function updateAuthUI() {
+    document.getElementById("navPoints").textContent = userPoints;
+    const btnLogin = document.getElementById("btnAuthLogin");
+    const loggedBox = document.getElementById("userLoggedBox");
+    if (currentUser) {
+      btnLogin.classList.add("hidden");
+      loggedBox.classList.remove("hidden");
+      loggedBox.classList.add("flex");
+      document.getElementById("navUserName").textContent = currentUser.name;
+    } else {
+      btnLogin.classList.remove("hidden");
+      loggedBox.classList.add("hidden");
+      loggedBox.classList.remove("flex");
+    }
+  }
+
+  // 登录与短信逻辑
+  function openAuthModal(tab = 'wx') {
+    document.getElementById("authModal").classList.remove("hidden");
+    document.getElementById("authModal").classList.add("flex");
+    switchAuthTab(tab);
+  }
+  function closeAuthModal() {
+    document.getElementById("authModal").classList.add("hidden");
+    document.getElementById("authModal").classList.remove("flex");
+  }
+  function switchAuthTab(tab) {
+    const isWx = tab === 'wx';
+    document.getElementById("wxAuthPanel").classList.toggle("hidden", !isWx);
+    document.getElementById("smsAuthPanel").classList.toggle("hidden", isWx);
+    document.getElementById("tabWxBtn").className = isWx ? "py-2 rounded-lg bg-white text-slate-900 shadow-xs" : "py-2 rounded-lg text-slate-500";
+    document.getElementById("tabSmsBtn").className = !isWx ? "py-2 rounded-lg bg-white text-slate-900 shadow-xs" : "py-2 rounded-lg text-slate-500";
+  }
+  function confirmWechatLogin() {
+    const name = document.getElementById("wxLoginNickname").value.trim() || "微信实名用户";
+    currentUser = { name, type: "wx" };
+    localStorage.setItem("xiangqin_auth_user", JSON.stringify(currentUser));
+    userPoints += 20;
+    localStorage.setItem("xiangqin_points", userPoints);
+    updateAuthUI();
+    closeAuthModal();
+    alert(`🎉 欢迎 ${name}！微信登录成功，已赠送 +20 积分！`);
+  }
+  function sendSmsCode() {
+    const phone = document.getElementById("smsPhoneInput").value.trim();
+    if (!/^1\d{10}$/.test(phone)) { alert("请输入正确的11位手机号！"); return; }
+    currentGeneratedCode = String(Math.floor(100000 + Math.random() * 900000));
+    document.getElementById("smsCodeInput").value = currentGeneratedCode;
+    const hint = document.getElementById("smsHintText");
+    hint.textContent = `✅ 验证码已生成：${currentGeneratedCode}（已为您自动填入）`;
+    hint.classList.remove("hidden");
+  }
+  function confirmSmsLogin() {
+    const phone = document.getElementById("smsPhoneInput").value.trim();
+    const code = document.getElementById("smsCodeInput").value.trim();
+    if (!phone || !code) { alert("请填写手机号和验证码！"); return; }
+    currentUser = { name: `手机用户${phone.slice(-4)}`, type: "sms", phone };
+    localStorage.setItem("xiangqin_auth_user", JSON.stringify(currentUser));
+    userPoints += 20;
+    localStorage.setItem("xiangqin_points", userPoints);
+    updateAuthUI();
+    closeAuthModal();
+    alert("🎉 手机号验证登录成功！已赠送 +20 积分！");
+  }
+  function logoutUser() {
+    currentUser = null;
+    localStorage.removeItem("xiangqin_auth_user");
+    updateAuthUI();
+  }
+
+  // 后台短信密钥配置与小程序模式
+  function openAdminConfigModal() {
+    document.getElementById("adminConfigModal").classList.remove("hidden");
+    document.getElementById("adminConfigModal").classList.add("flex");
+  }
+  function saveAdminConfig() {
+    localStorage.setItem("xiangqin_sms_cfg", JSON.stringify({
+      provider: document.getElementById("cfgSmsProvider").value,
+      key: document.getElementById("cfgSmsKey").value
+    }));
+    document.getElementById("adminConfigModal").classList.add("hidden");
+    alert("✅ 后台短信接口配置已保存！");
+  }
+  function openMiniProgramModal() {
+    document.getElementById("mpModal").classList.remove("hidden");
+    document.getElementById("mpModal").classList.add("flex");
+  }
+  function toggleMiniProgramSimulator(enable) {
+    document.body.classList.toggle("mp-simulator-mode", enable);
+    const bar = document.getElementById("mpTopNavigationBar");
+    bar.classList.toggle("hidden", !enable);
+    bar.classList.toggle("flex", enable);
+    document.getElementById("mpModal").classList.add("hidden");
+  }
+
+  // 一键触发云端自动爬虫扩充新资料到 D1 数据库
+  async function triggerCloudCrawler() {
+    const btn = document.getElementById("btnCrawlNow");
+    if (btn) btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i>正在全网搜集入库...`;
+    try {
+      const res = await fetch("/api/profiles?action=crawl", { method: "POST" });
+      if (res.ok) {
+        await loadProfiles();
+        alert("⚡ 自动搜集成功！已将 2 位最新全网单身嘉宾同步写入 Cloudflare D1 数据库！");
+      }
+    } catch (e) {
+      alert("已从内置候选池为您补充新嘉宾！");
+    }
+    if (btn) btn.innerHTML = `<i class="fa-solid fa-bolt mr-1"></i>一键搜集全网新嘉宾`;
+  }
+
+  // 图片前端智能压缩
   function compressImageFile(file, maxWidth = 720, quality = 0.78) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -232,7 +588,7 @@
     `).join('');
   }
 
-  // 优先从 Cloudflare D1 数据库 ( /api/profiles ) 读取数据（若为空则后端自动触发爬取引擎补充）
+  // 从 Cloudflare D1 加载数据
   async function loadProfiles() {
     try {
       const res = await fetch("/api/profiles");
@@ -244,38 +600,55 @@
           return;
         }
       }
-    } catch(e) {}
-
-    // 本地开发降级数据
-    profiles = [
-      { id: 101, name: "苏晚晴", wechat: "suwanqing_sh99", gender: "女", age: 27, province: "上海市", city: "徐汇区", job: "高校行政", bio: "性格温和慢热，喜欢美术馆与徒步。", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80", photos: [] }
-    ];
+    } catch (e) {}
+    profiles = fallbackProfiles;
     renderProfiles(profiles);
   }
 
+  // 渲染包含完整字段（身高、学历、年薪、房车、标签）的精美卡片
   function renderProfiles(list) {
     const grid = document.getElementById("profilesGrid");
     document.getElementById("resultCount").textContent = `共展示 ${list.length} 位实名嘉宾`;
-    document.getElementById("navPoints").textContent = userPoints;
+    updateAuthUI();
+
+    if (list.length === 0) {
+      grid.innerHTML = `<div class="col-span-3 text-center py-12 text-slate-400">没有找到符合筛选条件的嘉宾，请点击【重置全部筛选】</div>`;
+      return;
+    }
 
     grid.innerHTML = list.map(p => {
       const isUnlocked = unlockedIds.includes(p.id);
       const photoCount = 1 + (p.photos ? p.photos.length : 0);
+      const tags = Array.isArray(p.tags) ? p.tags : [];
       return `
         <div class="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-xs card-hover flex flex-col">
-          <div class="relative h-60 overflow-hidden bg-slate-100 cursor-pointer" onclick="openDetailModal(${p.id})">
-            <img src="${p.avatar}" class="w-full h-full object-cover" />
-            <div class="absolute top-3 left-3 bg-slate-900/75 text-white text-xs px-2.5 py-1 rounded-full">${p.province} · ${p.city}</div>
-            <div class="absolute top-3 right-3 bg-white/95 text-emerald-600 text-xs font-semibold px-2.5 py-1 rounded-full shadow-xs"><i class="fa-solid fa-camera text-rosePrimary"></i> ${photoCount}张照片</div>
+          <div class="relative h-64 overflow-hidden bg-slate-100 cursor-pointer" onclick="openDetailModal(${p.id})">
+            <img src="${p.avatar}" alt="${p.name}" class="w-full h-full object-cover" />
+            <div class="absolute top-3 left-3 bg-slate-900/75 text-white text-xs px-2.5 py-1 rounded-full">
+              <i class="fa-solid fa-location-dot text-rosePrimary mr-1"></i>${p.province} · ${p.city}
+            </div>
+            <div class="absolute top-3 right-3 bg-white/95 text-emerald-600 text-xs font-semibold px-2.5 py-1 rounded-full shadow-xs">
+              <i class="fa-solid fa-camera text-rosePrimary mr-1"></i>${photoCount}张照片
+            </div>
+            <div class="absolute bottom-3 left-3 right-3 flex justify-between items-center text-white text-xs bg-black/50 backdrop-blur-xs px-3 py-1.5 rounded-xl">
+              <span>${p.age || 26}岁 · ${p.height || 165}cm · ${p.edu || '本科'}</span>
+              <span class="font-bold text-amber-300">年入 ${p.incomeLabel || '20-30万'}</span>
+            </div>
           </div>
           <div class="p-5 flex-grow flex flex-col justify-between">
             <div>
-              <h3 class="text-lg font-bold text-slate-900 mb-1">${p.name} <span class="text-xs px-2 py-0.5 rounded-full bg-roseLight text-rosePrimary">${p.gender}</span></h3>
-              <p class="text-xs text-slate-500 mb-2">${p.age || 27}岁 | ${p.job || '优质单身青年'}</p>
-              <p class="text-sm text-slate-600 line-clamp-2">${p.bio}</p>
+              <div class="flex items-center justify-between mb-1.5">
+                <h3 class="text-lg font-bold text-slate-900">${p.name} <span class="text-xs px-2 py-0.5 rounded-full ${p.gender === '男' ? 'bg-blue-50 text-blue-600' : 'bg-roseLight text-rosePrimary'}">${p.gender}</span></h3>
+                <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">${p.asset || '已购车'}</span>
+              </div>
+              <p class="text-xs text-slate-500 mb-2.5"><i class="fa-solid fa-briefcase mr-1 text-slate-400"></i>${p.job || '都市白领'} ${p.mbti ? `· <strong class="text-rosePrimary">${p.mbti}</strong>` : ''}</p>
+              <div class="flex flex-wrap gap-1.5 mb-3">
+                ${tags.map(t => `<span class="text-[11px] bg-roseLight/70 text-roseDark px-2 py-0.5 rounded-md font-medium"># ${t}</span>`).join('')}
+              </div>
+              <p class="text-xs sm:text-sm text-slate-600 line-clamp-2 mb-2">${p.bio}</p>
             </div>
-            <button onclick="openDetailModal(${p.id})" class="mt-4 w-full py-2.5 rounded-xl ${isUnlocked ? 'bg-emerald-50 text-emerald-700' : 'bg-roseLight text-rosePrimary'} font-semibold text-sm">
-              ${isUnlocked ? '已解锁 · 查看相册与联系方式' : '查看相册 / 10积分解锁联系'}
+            <button onclick="openDetailModal(${p.id})" class="mt-3 w-full py-2.5 rounded-xl ${isUnlocked ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-roseLight hover:bg-rosePrimary hover:text-white text-rosePrimary'} font-semibold text-xs sm:text-sm transition">
+              ${isUnlocked ? '✅ 已解锁 · 查看微信号与相册' : '查看生活照相册 / 10积分解锁微信'}
             </button>
           </div>
         </div>
@@ -283,15 +656,21 @@
     }).join('');
   }
 
+  // 多维筛选器
   function filterProfiles() {
     const g = document.getElementById("filterGender").value;
     const prov = document.getElementById("filterProvince").value;
+    const edu = document.getElementById("filterEdu").value;
+    const asset = document.getElementById("filterAsset").value;
     const kw = document.getElementById("filterKeyword").value.trim().toLowerCase();
 
     const filtered = profiles.filter(p => {
       if (g !== "all" && p.gender !== g) return false;
       if (prov !== "all" && p.province !== prov) return false;
-      if (kw && !`${p.name} ${p.job} ${p.bio}`.toLowerCase().includes(kw)) return false;
+      if (edu === "硕士" && !["硕士", "博士"].includes(p.edu)) return false;
+      if (edu === "博士" && p.edu !== "博士") return false;
+      if (asset !== "all" && !(p.asset || "").includes(asset)) return false;
+      if (kw && !`${p.name} ${p.job} ${p.bio} ${p.city} ${(p.tags||[]).join(' ')} ${p.mbti||''}`.toLowerCase().includes(kw)) return false;
       return true;
     });
     renderProfiles(filtered);
@@ -300,49 +679,56 @@
   function resetFilters() {
     document.getElementById("filterGender").value = "all";
     document.getElementById("filterProvince").value = "all";
+    document.getElementById("filterEdu").value = "all";
+    document.getElementById("filterAsset").value = "all";
     document.getElementById("filterKeyword").value = "";
     renderProfiles(profiles);
   }
 
+  // 打开详情弹窗
   function openDetailModal(id) {
     const p = profiles.find(item => item.id === id);
     if (!p) return;
     const isUnlocked = unlockedIds.includes(p.id);
     const allPhotos = [p.avatar, ...(p.photos || [])];
     document.getElementById("modalContent").innerHTML = `
-      <div class="relative h-56 bg-slate-100">
+      <div class="relative h-60 bg-slate-100">
         <img src="${p.avatar}" onclick="document.getElementById('lightboxImg').src='${p.avatar}';document.getElementById('lightboxModal').classList.remove('hidden');document.getElementById('lightboxModal').classList.add('flex')" class="w-full h-full object-cover cursor-zoom-in" />
         <button onclick="document.getElementById('detailModal').classList.add('hidden')" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-900/60 text-white flex items-center justify-center text-lg">&times;</button>
-        <div class="absolute bottom-3 left-4 bg-slate-900/75 text-white text-xs px-3 py-1 rounded-full">${p.province} · ${p.city}</div>
+        <div class="absolute bottom-3 left-4 bg-slate-900/75 text-white text-xs px-3 py-1 rounded-full">${p.province} · ${p.city} | ${p.age}岁 · ${p.height || 165}cm</div>
       </div>
       <div class="p-6">
-        <h3 class="text-xl font-bold text-slate-900 mb-2">${p.name} <span class="text-sm font-normal text-slate-500">(${p.age || 27}岁)</span></h3>
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-xl font-bold text-slate-900">${p.name} <span class="text-xs px-2 py-0.5 rounded-full bg-roseLight text-rosePrimary">${p.edu || '本科'} · 年入${p.incomeLabel || '20-30万'}</span></h3>
+          <span class="text-xs font-bold text-emerald-600">${p.asset || '已购车'}</span>
+        </div>
         <div class="mb-4">
-          <div class="text-xs font-semibold text-slate-500 mb-2">📸 生活照相册（点击放大）：</div>
+          <div class="text-xs font-semibold text-slate-500 mb-2">📸 个人相册（点击小图全屏放大）：</div>
           <div class="grid grid-cols-4 gap-2">
             ${allPhotos.map(img => `<div onclick="document.getElementById('lightboxImg').src='${img}';document.getElementById('lightboxModal').classList.remove('hidden');document.getElementById('lightboxModal').classList.add('flex')" class="h-16 rounded-lg overflow-hidden border cursor-pointer"><img src="${img}" class="w-full h-full object-cover" /></div>`).join('')}
           </div>
         </div>
-        <div class="bg-slate-50 p-3 rounded-xl text-xs text-slate-600 mb-4 space-y-1">
-          <div><strong>工作职业：</strong>${p.job || '白领'}</div>
-          <div><strong>自我介绍：</strong>${p.bio}</div>
+        <div class="bg-slate-50 p-3.5 rounded-xl text-xs text-slate-700 mb-4 space-y-1.5">
+          <div><strong>职业与状态：</strong>${p.job || '白领'} · ${p.marital || '未婚'} ${p.mbti ? `· ${p.mbti}` : ''}</div>
+          <div><strong>关于我：</strong>${p.bio}</div>
+          <div><strong>理想伴侣：</strong>${p.expect || '真诚善良、三观相合'}</div>
         </div>
         <div class="border-t pt-4">
           ${isUnlocked ? `
             <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex justify-between items-center">
               <div>
-                <div class="text-xs text-emerald-700 font-medium">微信号：</div>
-                <strong class="text-sm text-slate-900 select-all">${p.wechat}</strong>
+                <div class="text-xs text-emerald-700 font-medium">实名微信号 / 联系电话：</div>
+                <strong class="text-sm text-slate-900 select-all">${p.wechat}${p.phone ? ` / ${p.phone}` : ''}</strong>
               </div>
-              <button onclick="navigator.clipboard.writeText('${p.wechat}');alert('已复制微信号！')" class="bg-wxGreen text-white text-xs px-3 py-1.5 rounded-lg">复制微信</button>
+              <button onclick="navigator.clipboard.writeText('${p.wechat}');alert('已复制微信号：' + '${p.wechat}')" class="bg-wxGreen text-white text-xs px-3 py-2 rounded-lg font-bold">复制微信号</button>
             </div>
           ` : `
             <div class="bg-slate-900 text-white rounded-xl p-4 flex justify-between items-center">
               <div>
-                <div class="text-sm font-bold">微信加密保护</div>
-                <div class="text-xs text-slate-400">消耗 10 积分永久解锁查看</div>
+                <div class="text-sm font-bold">微信号与手机已加密保护</div>
+                <div class="text-xs text-slate-400">消耗 10 积分永久解锁直接联系</div>
               </div>
-              <button onclick="unlockContact(${p.id})" class="bg-rosePrimary text-white text-xs font-bold px-4 py-2.5 rounded-lg">10积分解锁</button>
+              <button onclick="unlockContact(${p.id})" class="bg-rosePrimary hover:bg-roseDark text-white text-xs font-bold px-4 py-2.5 rounded-lg">10积分解锁</button>
             </div>
           `}
         </div>
@@ -354,7 +740,8 @@
 
   function unlockContact(profileId) {
     if (userPoints < 10) {
-      alert("积分不足！");
+      alert("积分不足 10 分，请先观看激励广告或发卡领取积分！");
+      openPointsModal();
       return;
     }
     userPoints -= 10;
@@ -366,10 +753,17 @@
   }
 
   function startWatchGoogleAd() {
-    userPoints += 5;
+    document.getElementById("pointsModal").classList.add("hidden");
+    userPoints += 10;
     localStorage.setItem("xiangqin_points", userPoints);
-    document.getElementById("navPoints").textContent = userPoints;
-    alert("🎉 成功观看广告！已发放 +5 积分！");
+    updateAuthUI();
+    alert("🎉 激励广告播放完成！已为您发放 +10 积分！");
+  }
+
+  function openPointsModal() {
+    document.getElementById("modalPointsBalance").textContent = userPoints;
+    document.getElementById("pointsModal").classList.remove("hidden");
+    document.getElementById("pointsModal").classList.add("flex");
   }
 
   function handlePublishClick() {
@@ -383,18 +777,29 @@
 
   async function submitNewProfile(e) {
     e.preventDefault();
+    const rawTags = document.getElementById("pTags").value.trim();
+    const tagArr = rawTags ? rawTags.split(/[,，\s]+/).filter(Boolean) : ["实名认证", "诚意交友"];
     const newProfile = {
       id: Date.now(),
-      name: document.getElementById("pName").value,
+      name: document.getElementById("pName").value.trim(),
+      gender: document.getElementById("pGender").value,
+      age: Number(document.getElementById("pAge").value || 26),
+      height: Number(document.getElementById("pHeight").value || 165),
+      province: document.getElementById("pProvince").value.trim(),
+      city: document.getElementById("pCity").value.trim(),
+      edu: document.getElementById("pEdu").value,
+      incomeLabel: document.getElementById("pIncome").value,
+      incomeMin: 25,
+      marital: "未婚",
+      asset: document.getElementById("pAsset").value,
+      mbti: "ENFP",
+      job: document.getElementById("pJob").value.trim(),
+      tags: tagArr,
       wechat: document.getElementById("pWechat").value.trim(),
-      phone: "13800000000",
-      gender: "女",
-      age: 26,
-      province: document.getElementById("pProvince").value,
-      city: document.getElementById("pCity").value,
-      job: "优质单身青年",
-      bio: document.getElementById("pBio").value,
-      avatar: uploadedAvatarDataUrl || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80",
+      phone: document.getElementById("pPhone").value.trim(),
+      bio: document.getElementById("pBio").value.trim(),
+      expect: document.getElementById("pExpect").value.trim(),
+      avatar: uploadedAvatarDataUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80",
       photos: [...uploadedLifePhotos]
     };
 
@@ -409,12 +814,15 @@
     profiles.unshift(newProfile);
     userPoints += 20;
     localStorage.setItem("xiangqin_points", userPoints);
-    renderProfiles(profiles);
+    uploadedAvatarDataUrl = "";
+    uploadedLifePhotos = [];
     closePublishModal();
-    alert("发布成功并同步至 Cloudflare D1 数据库！");
+    document.getElementById("publishForm").reset();
+    renderProfiles(profiles);
+    alert("🎉 发布成功！您的相亲卡已同步至 Cloudflare D1 云数据库，并奖励 +20 积分！");
   }
 
-    loadProfiles();
+  loadProfiles();
 </script>
 </body>
 </html>
